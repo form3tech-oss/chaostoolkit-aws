@@ -45,6 +45,14 @@ def terminate_random_nodes(cluster_name: str,
                            node_count: int,
                            termination_timeout: int = 60,
                            secrets: Secrets = None):
+    """
+    Terminate random EKS nodes.
+
+    The cluster_name must be specified so that a node instance (or multiple)
+    can be terminated. termination_timeout controls how long a termination
+    should take and is set to 60 by default; if the instance cannot be
+    terminated within this timeout, the action will fail.
+    """
     ec2_client = aws_client("ec2",
                             {"aws_region": aws_region},
                             secrets)
