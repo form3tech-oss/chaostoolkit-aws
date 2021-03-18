@@ -66,7 +66,7 @@ def terminate_random_nodes(cluster_name: str,
     instances_to_terminate = random.sample(cluster_instances, node_count)
     for instanceId in instances_to_terminate:
         logger.info("Terminating {} instance".format(instanceId))
-        # terminate_instance(instanceId)
+        terminate_instance(instanceId)
         timeout = datetime.datetime.now() + datetime. \
             timedelta(0, termination_timeout)
         _wait_for(
