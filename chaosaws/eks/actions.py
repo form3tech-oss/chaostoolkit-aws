@@ -51,19 +51,14 @@ def terminate_random_nodes(cluster_name: str,
     ec2_describe_response = ec2_client.describe_instances(Filters=[
         {
             'Name': 'instance-state-name',
-            'Values': [
-                'running'
-            ]
+            'Values': ['running']
         },
         {
             'Name': 'network-interface.group-name',
-            'Values': [
-                "{}-workers".format(cluster_name)
-            ]
+            'Values': ["{}-workers".format(cluster_name)]
         }
     ])
     cluster_instances = []
-    # raise ActivityFailed("alalal")
     for reservation in ec2_describe_response['Reservations']:
         for instance in reservation['Instances']:
             cluster_instances.append(instance['InstanceId'])
@@ -71,7 +66,7 @@ def terminate_random_nodes(cluster_name: str,
     instances_to_terminate = random.sample(cluster_instances, node_count)
     for instanceId in instances_to_terminate:
         logger.info("Terminating {} instance".format(instanceId))
-        terminate_instance(instanceId)
+        # terminate_instance(instanceId)
         timeout = datetime.datetime.now() + datetime. \
             timedelta(0, termination_timeout)
         _wait_for(
@@ -101,13 +96,13 @@ def _wait_for(
 def _get_instance_from_instances(instances):
     if len(instances["Reservations"]) != 1:
         raise ActivityFailed(
-            "unexpected number of reservations when listing ec2 instances: {}".
-                format(len(instances["Reservations"]))
+            "unexpected number of reservations when listing "
+            "ec2 instances: {}".format(len(instances["Reservations"]))
         )
     if len(instances["Reservations"][0]["Instances"]) != 1:
         raise ActivityFailed(
-            "unexpected number of instances for filter: {}".
-                format(len(instances["Reservations"]["Instances"]))
+            "unexpected number of instances for filter: {}".format(
+                len(instances["Reservations"]["Instances"]))
         )
     return instances["Reservations"][0]["Instances"][0]
 

@@ -2,8 +2,9 @@
 start-venv:
 	pipenv shell
 
-#setup:
-#	python3 setup.py develop
+lint:
+	pycodestyle --first chaosaws
+
 
 pip-install:
 	pip3 install -r requirements.txt
