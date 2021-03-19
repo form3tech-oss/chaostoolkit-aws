@@ -2,7 +2,7 @@
 import datetime
 import time
 from json import JSONEncoder
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
 from chaoslib.types import Configuration, Secrets
 
@@ -74,7 +74,8 @@ def terminate_random_nodes(cluster_name: str,
     instances_to_terminate = random.sample(cluster_instances, node_count)
     for instanceId in instances_to_terminate:
         logger.info("Terminating {} instance".format(instanceId))
-        terminate_instance(instanceId)
+        terminate_instance(instance_id=instanceId,
+                           configuration={"aws_region": aws_region})
         timeout = datetime.datetime.now() + datetime. \
             timedelta(0, termination_timeout)
         _wait_for(

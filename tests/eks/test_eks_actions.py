@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from unittest.mock import MagicMock, Mock, patch
 
+from chaoslib.types import Configuration
+
 from chaosaws.eks.actions import create_cluster, delete_cluster, \
     terminate_random_nodes
 
@@ -37,7 +39,7 @@ def test_terminate_random_nodes_should_terminate_correct_count(
         aws_client):
     terminate_calls = 0
 
-    def terminate_side_effect(*args):
+    def terminate_side_effect(instance_id: str, configuration: Configuration):
         nonlocal terminate_calls
         terminate_calls = terminate_calls + 1
         return [Mock()]
@@ -53,7 +55,8 @@ def test_terminate_random_nodes_should_terminate_correct_count(
         ]
     aws_client.return_value = ec2_client
     terminate_instance.side_effect = terminate_side_effect
-    terminate_random_nodes("awdasd", "eu_west_00", 1, 30)
+    terminate_random_nodes("a_cluster", "eu_west_00", 1, 30)
 
     assert terminate_calls == 1
-    terminate_instance.assert_called_with("foo")
+    terminate_instance.assert_called_with(
+        instance_id="foo", configuration={"aws_region": "eu_west_00"})
