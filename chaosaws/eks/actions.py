@@ -123,13 +123,3 @@ def _instance_to_reach_terminated_state(ec2_client, instanceId) -> bool:
     }])
     updated_instance = _get_instance_from_instances(instances)
     return updated_instance["State"]["Name"] == "terminated"
-
-
-def _terminate_instance(instanceId: str):
-    logger.info("terminating instance {}".format(instanceId))
-    termination_response = terminate_instance(instanceId)
-    if len(termination_response) > 1:
-        raise ActivityFailed("{} ec2 instances appear to have been deleted".
-                             format(len(termination_response)))
-    else:
-        logger.info("instance terminated")
