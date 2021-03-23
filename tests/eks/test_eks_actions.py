@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
-from chaosaws.eks.actions import create_cluster, delete_cluster
+from chaoslib.types import Configuration
+
+from chaosaws.eks.actions import create_cluster, delete_cluster, \
+    terminate_random_nodes
 
 
 @patch('chaosaws.eks.actions.aws_client', autospec=True)
@@ -27,3 +30,33 @@ def test_delete_cluster(aws_client):
     cluster = "eks-cluster"
     delete_cluster(name=cluster)
     client.delete_cluster.assert_called_with(name=cluster)
+
+
+@patch("chaosaws.eks.actions.aws_client", autospec=True)
+@patch("chaosaws.eks.actions.terminate_instance", autospec=True)
+def test_terminate_random_nodes_should_terminate_correct_count(
+        terminate_instance,
+        aws_client):
+    terminate_calls = 0
+
+    def terminate_side_effect(instance_id: str, configuration: Configuration):
+        nonlocal terminate_calls
+        terminate_calls = terminate_calls + 1
+        return [Mock()]
+
+    ec2_client = MagicMock()
+    ec2_client.describe_instances.side_effect = [
+            {"Reservations": [
+                {"Instances": [{"InstanceId": "foo"}]}
+            ]},
+            {"Reservations": [
+                {"Instances": [{"State": {"Name": "terminated"}}]}
+            ]}
+        ]
+    aws_client.return_value = ec2_client
+    terminate_instance.side_effect = terminate_side_effect
+    terminate_random_nodes("a_cluster", "eu_west_00", 1, 30)
+
+    assert terminate_calls == 1
+    terminate_instance.assert_called_with(
+        instance_id="foo", configuration={"aws_region": "eu_west_00"})

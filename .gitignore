@@ -110,3 +110,10 @@ junit-test-results.xml
 
 # vim
 *.swp
+
+Pipfile
+Pipfile.lock
+
+experiment.yaml
+experiment.json
+journal.json
